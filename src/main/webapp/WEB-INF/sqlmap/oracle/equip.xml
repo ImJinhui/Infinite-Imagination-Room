@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="equip">
+
+	<select id="modeList" resultType="Map" parameterType="Map" timeout="10">
+	select 
+	r.EQUIP_SEQ
+	, e. EQUIP_NAME
+	, count(r.EQUIP_SEQ)
+	, img.PHYSICALFILE_NAME
+	from RESERVATION r, equip_image img, equip e
+	where 
+	r.EQUIP_SEQ = img.SOURCE_UNIQUE_SEQ
+	and e.EQUIP_SEQ = r.EQUIP_SEQ
+	group by r.EQUIP_SEQ
+	ORDER BY COUNT(	r.EQUIP_SEQ ) DESC
+	LIMIT 3
+	</select>
+
+	<select id="list" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			e.EQUIP_SEQ	
+			,e.SUB_CATEGORY_SEQ	
+			,e.MANUFACTURER
+			,e.DESCRIPTION	
+			,e.MANAGER	
+			,e.EQUIP_NAME
+			,e.AVAILABLE
+			,e.ABILITY
+			,sc.SUB_CATEGORY_NAME
+      		,img.PHYSICALFILE_NAME 
+		from SUB_CATEGORY sc , EQUIP e LEFT OUTER JOIN EQUIP_IMAGE img 
+    	ON e.EQUIP_SEQ = img.SOURCE_UNIQUE_SEQ 
+		where 
+		e.SUB_CATEGORY_SEQ = sc.SUB_CATEGORY_SEQ
+		and e.VISIBLE = 'T'
+		order by e.SUB_CATEGORY_SEQ, e.EQUIP_SEQ
+	</select>
+	
+	<select id="listByCate" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			e.EQUIP_SEQ	
+			,e.SUB_CATEGORY_SEQ	
+			,e.MANUFACTURER
+			,e.DESCRIPTION	
+			,e.MANAGER	
+			,e.EQUIP_NAME
+			,e.AVAILABLE
+			,e.ABILITY
+			,sc.SUB_CATEGORY_NAME
+      		,img.PHYSICALFILE_NAME 
+		from SUB_CATEGORY sc , EQUIP e LEFT OUTER JOIN EQUIP_IMAGE img 
+    	ON e.EQUIP_SEQ = img.SOURCE_UNIQUE_SEQ 
+		where 
+		e.SUB_CATEGORY_SEQ = sc.SUB_CATEGORY_SEQ
+		and e.VISIBLE = 'T'
+		and e.SUB_CATEGORY_SEQ = #{SUB_CATEGORY_SEQ}
+		order by e.SUB_CATEGORY_SEQ, e.EQUIP_SEQ
+		
+	</select>
+	
+	<select id="cateList" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			CATEGORY_SEQ
+			,CATEGORY_NAME
+		from CATEGORY 
+		where VISIBLE = 'T'
+		
+	</select> 
+	
+	<select id="subCateList" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			SUB_CATEGORY_SEQ
+			,SUB_CATEGORY_NAME
+			,CATEGORY_SEQ
+		from SUB_CATEGORY
+		<where>
+		    <if test="CATEGORY_SEQ != null">
+		        and CATEGORY_SEQ = #{CATEGORY_SEQ}
+		    </if>
+		    and VISIBLE = 'T'
+		</where>
+	</select> 
+
+	<insert id="merge">
+	INSERT INTO EQUIP(
+		EQUIP_SEQ
+		,SUB_CATEGORY_SEQ
+		,MANUFACTURER
+		,DESCRIPTION
+		,MANAGER
+		,EQUIP_NAME
+		,VISIBLE
+		,AVAILABLE
+		,ABILITY
+		)
+	values(
+		#{EQUIP_SEQ}
+		,#{SUB_CATEGORY_SEQ}
+		,#{MANUFACTURER}
+		,#{DESCRIPTION}
+		,#{MANAGER}
+		,#{EQUIP_NAME}
+		,'T'
+		,#{AVAILABLE}
+		,#{ABILITY}
+		)
+	ON DUPLICATE KEY UPDATE
+	EQUIP_SEQ = #{EQUIP_SEQ}
+	,SUB_CATEGORY_SEQ = #{SUB_CATEGORY_SEQ}
+	,MANUFACTURER = #{MANUFACTURER}
+	,DESCRIPTION = #{DESCRIPTION}
+	,MANAGER = #{MANAGER}
+	,EQUIP_NAME = #{EQUIP_NAME}
+	,VISIBLE = 'T'
+	,AVAILABLE = #{AVAILABLE}
+	,ABILITY = #{ABILITY}
+	</insert>
+	
+	<select id="read" resultType="Map" parameterType="Map">
+		select 
+			e.EQUIP_SEQ
+			, e.SUB_CATEGORY_SEQ
+			, e.MANUFACTURER
+			, e.DESCRIPTION
+			, e.MANAGER
+			, e.EQUIP_NAME
+			, e.AVAILABLE
+			, e.ABILITY
+			, img.PHYSICALFILE_NAME
+			, img.ATTACHFILE_SEQ
+		from EQUIP e LEFT OUTER JOIN EQUIP_IMAGE img
+		on e.EQUIP_SEQ = img.SOURCE_UNIQUE_SEQ 
+		where e.EQUIP_SEQ = #{EQUIP_SEQ}
+	</select>
+	
+	 <update id="delete" parameterType="Map">
+		update EQUIP
+		set VISIBLE = 'F'
+		where EQUIP_SEQ = #{EQUIP_SEQ}
+	</update> 
+</mapper>

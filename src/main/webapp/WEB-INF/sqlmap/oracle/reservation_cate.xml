@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="reservation_cate">
+	<select id="list" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			SUB_CATEGORY_SEQ, SUB_CATEGORY_NAME
+		from SUB_CATEGORY
+	</select>
+	
+	<select id="abilitylist" resultType="Map" parameterType="Map" timeout="10">
+		select ABILITY_SEQ
+		from member_ability_rel
+		where MEMBER_SEQ = #{MEMBER_SEQ}
+	</select>
+	
+	<select id="subcatelist" resultType="Map" parameterType="Map" timeout="10">
+		select SUB_CATEGORY_SEQ
+		from abilities
+		where 
+		<foreach collection="abilitiesList" item="item" index="index" separator="or">
+			ABILITY_SEQ = #{item.ABILITY_SEQ}
+		</foreach>
+	</select>
+	
+	<select id="equipplacelist" resultType="Map" parameterType="Map" timeout="10">
+		select SUB_CATEGORY_SEQ, SUB_CATEGORY_NAME
+		from SUB_CATEGORY
+		where 
+		<foreach collection="abilitiesList" item="item" index="index" separator="or">
+			SUB_CATEGORY_SEQ = #{item.SUB_CATEGORY_SEQ}
+		</foreach>
+	</select>
+	
+	<select id="equiplist" resultType="Map" parameterType="Map" timeout="10">
+		select 
+			EQUIP_SEQ
+		from EQUIP
+		where SUB_CATEGORY_SEQ = #{SUB_CATEGORY_SEQ}
+	</select>
+	<select id="reservelist" resultType="Map" parameterType="Map">
+		select 
+			RESERVE_DATE,
+			RESERVE_S_TIME,
+			RESERVE_E_TIME,
+			EQUIP_SEQ
+		from RESERVATION
+		where RESERVE_DATE between #{RESERVE_S_DATE} and #{RESERVE_E_DATE} and EQUIP_SEQ=#{EQUIP_SEQ}
+	</select>
+	
+ 	<insert id="insertreserve" parameterType="Map">
+		INSERT
+			INTO RESERVATION(
+				ID,
+				EQUIP_SEQ,
+				NUM_OF_USER,
+				RESERVE_DATE,
+				RESERVE_S_TIME,
+				NUM_OF_PROTOTYPE,
+				RETURN_CHECK,
+				RESERVE_E_TIME
+				)
+				values
+		<foreach collection="reservationList" item="item" index="index" separator=",">
+			(
+				#{item.ID},
+				#{item.EQUIP_SEQ},
+				'1',
+				#{item.RESERVE_DATE},
+				#{item.RESERVE_S_TIME},
+				'0',
+				'F',
+				#{item.RESERVE_E_TIME}
+			)
+		</foreach>
+	</insert>
+	
+	
+	
+	<select id="read" resultType="Map" parameterType="Map">
+		select 
+			ORGANIZATION_SEQ	<!-- 조직 일련번호 -->
+			, NAME	<!-- 명칭 -->
+			, TELEPHONE	<!-- 대표 전화번호 -->
+			, ORDER_NUMBER	<!-- 정렬순서 -->
+			, PARENT_ORGANIZATION_SEQ	<!-- 상위 조직 일련번호 -->
+		from CIP_ORGANIZATION
+		where ORGANIZATION_SEQ = #{ORGANIZATION_SEQ}
+	</select>
+
+	<insert id="merge" parameterType="Map">
+		MERGE INTO CIP_ORGANIZATION CIP1
+		     USING (SELECT #{ORGANIZATION_SEQ} AS ORGANIZATION_SEQ FROM DUAL) CIP2
+		        ON (CIP1.ORGANIZATION_SEQ = CIP2.ORGANIZATION_SEQ)
+		 WHEN MATCHED THEN
+		    UPDATE SET
+				NAME = #{NAME} 	<!-- 명칭 -->
+				, TELEPHONE = #{TELEPHONE} 	<!-- 대표 전화번호 -->
+				, ORDER_NUMBER = #{ORDER_NUMBER} 	<!-- 정렬순서 -->
+				, PARENT_ORGANIZATION_SEQ = #{PARENT_ORGANIZATION_SEQ} 	<!-- 상위 조직 일련번호 -->
+		 WHEN NOT MATCHED THEN
+		    INSERT (
+				ORGANIZATION_SEQ	<!-- 조직 일련번호 -->
+				, NAME	<!-- 명칭 -->
+				, TELEPHONE	<!-- 대표 전화번호 -->
+				, ORDER_NUMBER	<!-- 정렬순서 -->
+				, PARENT_ORGANIZATION_SEQ	<!-- 상위 조직 일련번호 -->
+			)
+			values(
+				#{ORGANIZATION_SEQ}	<!-- 조직 일련번호 -->
+				, #{NAME}	<!-- 명칭 -->
+				, #{TELEPHONE}	<!-- 대표 전화번호 -->
+				, #{ORDER_NUMBER}	<!-- 정렬순서 -->
+				, #{PARENT_ORGANIZATION_SEQ}	<!-- 상위 조직 일련번호 -->
+			)
+	</insert>
+
+	<delete id="delete" parameterType="Map">
+		delete from CIP_ORGANIZATION
+		where ORGANIZATION_SEQ = #{ORGANIZATION_SEQ}
+	</delete>
+</mapper>

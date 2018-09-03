@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+	<select id="list" resultType="Map" parameterType="Map">
+		<!-- select m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, m.SUB_ADDR_SEQ, 
+			ma.ABILITY_NAME from MEMBER m, MEMBER_ABILITY_REL mr, ABILITIES ma where 
+			mr.ABILITY_SEQ = ma.ABILITY_SEQ and mr.MEMBER_SEQ = m.MEMBER_SEQ order by 
+			m.MEMBER_SEQ -->
+
+		select m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, m.SUB_ADDR_SEQ
+		from MEMBER m
+		order by m.MEMBER_SEQ
+
+	</select>
+
+	<select id="abilitylist" resultType="Map" parameterType="Map">
+		select
+		abi.ABILITY_NAME
+		from MEMBER m, MEMBER_ABILITY_REL rel, ABILITIES abi,
+		sub_category sub
+		where rel.MEMBER_SEQ = m.MEMBER_SEQ
+		and rel.ABILITY_SEQ
+		= abi.ABILITY_SEQ
+		and abi.sub_category_seq = sub.sub_category_seq
+		and
+		20000>sub.CATEGORY_SEQ
+		and m.MEMBER_SEQ = #{MEMBER_SEQ}
+	</select>
+
+
+	<select id="check" resultType="Map" parameterType="Map">
+		select ID,
+		PASSWORD
+		from MEMBER
+		where ID = #{id}
+	</select>
+
+
+
+	<select id="subaddlist" resultType="Map" parameterType="Map">
+		select
+		sub.SUB_ADDR_NAME, sub.SUB_ADDR_SEQ
+		from sub_address sub, address addr
+		where sub.ADDR_SEQ = addr.ADDR_SEQ
+		and addr.ADDR_SEQ=#{ADDR_SEQ}
+	</select>
+
+	<select id="addlist" resultType="Map" parameterType="Map">
+		select *
+		from address
+		order by ADDR_SEQ
+	</select>
+
+	<insert id="insert">
+		insert into member(
+		MEMBER_SEQ, ID, PASSWORD, TEL,
+		NAME, SUB_ADDR_SEQ, AUTHORITY_SEQ, SIGNUP_DATE, VISIBLE
+		)value(#{MEMBER_SEQ},#{ID},#{PASSWORD},#{TEL},#{NAME},#{cate2},'1',CURRENT_DATE(
+		),'TRUE')
+
+	</insert>
+
+	<insert id="insertplace" parameterType="java.util.Map">
+		<if test="place.size != 0">
+			insert into member_ability_rel(MEMBER_SEQ, ABILITY_SEQ, MANAGER,
+			OBTAIN_DATE) values
+
+			<foreach collection="place" item="item" separator=",">
+				(#{MEMBER_SEQ},#{item.ABILITY_SEQ},'자동',CURRENT_DATE())
+
+			</foreach>
+		</if>
+
+	</insert>
+	<!-- <insert id="insertAbility"> insert into member_ability_rel MEMBER_SEQ, 
+		ABILITY_SEQ </insert> -->
+
+	<update id="update">
+		update member
+		set
+		ID=#{ID}
+		, PASSWORD=#{PASSWORD}
+		, NAME=#{NAME}
+		, TEL=#{TEL}
+		where ID = #{ID}
+	</update>
+
+	<update id="adminupdate">
+	update member 
+	set 
+	ID = #{ID}
+	, PASSWORD=#{PASSWORD}
+	, NAME=#{NAME}
+	, TEL=#{TEL}
+	, SUB_ADDR_SEQ=#{cate2}
+	, AUTHORITY_SEQ=#{AUTHORITY_SEQ} 
+	where MEMBER_SEQ =	#{MEMBER_SEQ}
+	</update>
+
+	<select id="info" resultType="Map" parameterType="Map">
+		select
+		m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, sub.SUB_ADDR_NAME,
+		addr.ADDR_NAME
+		from MEMBER m, address addr, sub_address sub
+		where
+		m.SUB_ADDR_SEQ = sub.SUB_ADDR_SEQ
+		and sub.ADDR_SEQ = addr.ADDR_SEQ
+		and
+		m.MEMBER_SEQ=#{MEMBER_SEQ}
+	</select>
+
+	<select id="myinfo" resultType="Map" parameterType="Map">
+		<choose>
+			<when test="SUB_ADDR_NAME!=null">
+				select
+				m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL,
+				sub.SUB_ADDR_NAME, addr.ADDR_NAME
+				from MEMBER m, address addr,
+				sub_address sub
+				where
+				m.SUB_ADDR_SEQ = sub.SUB_ADDR_SEQ
+				and
+				sub.ADDR_SEQ = addr.ADDR_SEQ
+				and
+				m.ID=#{id}
+			</when>
+			<otherwise>
+				select
+				m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL
+				from
+				MEMBER m
+				where
+				m.ID=#{id}
+			</otherwise>
+		</choose>
+
+
+		<!-- select m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, sub.SUB_ADDR_NAME, 
+			addr.ADDR_NAME from MEMBER m, address addr, sub_address sub where m.SUB_ADDR_SEQ 
+			= sub.SUB_ADDR_SEQ and sub.ADDR_SEQ = addr.ADDR_SEQ and m.ID=#{id} -->
+	</select>
+
+	<select id="read" resultType="Map" parameterType="Map">
+		select* from
+		member
+		where ID=#{id}
+
+	</select>
+
+
+
+	<select id="read1" resultType="Map" parameterType="Map">
+
+		select
+		m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, m.AUTHORITY_SEQ, m.SUB_ADDR_SEQ,
+		addr.ADDR_SEQ
+		from MEMBER m, address addr, sub_address sub
+		where m.SUB_ADDR_SEQ = sub.SUB_ADDR_SEQ
+		and sub.ADDR_SEQ = addr.ADDR_SEQ
+		and m.MEMBER_SEQ=#{MEMBER_SEQ}
+
+
+		<!-- select m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, m.AUTHORITY_SEQ, 
+			m.SUB_ADDR_SEQ, addr.ADDR_SEQ, from MEMBER m, address addr, sub_address sub 
+			where m.SUB_ADDR_SEQ = sub.SUB_ADDR_SEQ and sub.ADDR_SEQ = addr.ADDR_SEQ 
+			and m.MEMBER_SEQ=#{MEMBER_SEQ} -->
+
+	</select>
+
+	<select id="read2" resultType="Map" parameterType="Map">
+		select
+		m.MEMBER_SEQ, m.NAME, m.ID, m.PASSWORD, m.TEL, abi.ABILITY_NAME,
+		rel.MANAGER, rel.OBTAIN_DATE
+		from member_ability_rel rel, abilities
+		abi, member m, sub_category sub
+		where m.MEMBER_SEQ = rel.MEMBER_SEQ
+		and
+		rel.ABILITY_SEQ =abi.ABILITY_SEQ
+		and rel.MEMBER_SEQ = m.MEMBER_SEQ
+		and
+		abi.sub_category_seq = sub.sub_category_seq
+		and 20000>sub.CATEGORY_SEQ
+		and m.MEMBER_SEQ=#{MEMBER_SEQ}
+		ORDER BY rel.OBTAIN_DATE ASC
+	</select>
+
+	<select id="getmemberADDR" resultType="Map" parameterType="Map">
+		select sub.SUB_ADDR_NAME,sub.SUB_ADDR_SEQ, addr.ADDR_NAME,
+		addr.ADDR_SEQ
+		from member m, sub_address sub, address addr
+		where
+		m.SUB_ADDR_SEQ=sub.SUB_ADDR_SEQ
+		and sub.ADDR_SEQ = addr.ADDR_SEQ
+		and
+		m.MEMBER_SEQ=#{MEMBER_SEQ}
+		and sub.SUB_ADDR_SEQ=#{SUB_ADDR_SEQ}
+	</select>
+
+
+
+	<select id="ability_list" resultType="Map" parameterType="Map">
+		select *
+		from ABILITIES a, SUB_CATEGORY sub
+		where
+		a.SUB_CATEGORY_SEQ = sub.SUB_CATEGORY_SEQ
+		and 20000>sub.CATEGORY_SEQ
+	</select>
+
+	<insert id="ability_insert">
+		insert into member_ability_rel (MEMBER_SEQ,
+		ABILITY_SEQ, MANAGER, OBTAIN_DATE)
+		value(#{MEMBER_SEQ},#{ability},#{MANAGER},#{OBTAIN_DATE})
+
+	</insert>
+
+
+	<!-- pagination + memberList -->
+
+	<select id="listpagination" resultType="Map" parameterType="Map">
+		select* from member where VISIBLE='TRUE' order by NAME ASC
+		Limit
+		#{pagination.pageBegin},10
+	</select>
+
+	<select id="totalcount" resultType="Integer" parameterType="Map">
+		select count(MEMBER_SEQ)
+		from member
+		where VISIBLE='TRUE'
+	</select>
+
+	<!-- <select id="totalcount_id" resultType="Integer" parameterType="Map"> 
+		select count(MEMBER_SEQ) from member where ID=#{input} and VISIBLE='TRUE' 
+		</select> <select id="totalcount_name" resultType="Integer" parameterType="Map"> 
+		select count(MEMBER_SEQ) from member where NAME=#{input} andVISIBLE='TRUE' 
+		</select> <select id="totalcount_tel" resultType="Integer" parameterType="Map"> 
+		select count(MEMBER_SEQ) from member where TEL=#{input} and VISIBLE='TRUE' 
+		</select> -->
+	<!-- /pagination+ memberList -->
+
+	<select id="hasAbility" resultType="Map" parameterType="Map">
+		select
+		ABILITY_SEQ
+		from member_ability_rel
+		where MEMBER_SEQ=#{member_seq}
+		and
+		ABILITY_SEQ=#{ability_seq}
+
+	</select>
+
+	<update id="delete">
+		update member set VISIBLE=#{VISIBLE} where ID=#{ID}
+	</update>
+
+	<select id="find_name" resultType="Map" parameterType="Map">
+		select
+		*from member where NAME=#{input} and VISIBLE='TRUE'
+	</select>
+
+	<select id="find_id" resultType="Map" parameterType="Map">
+		select *from
+		member where ID=#{input} and VISIBLE='TRUE'
+	</select>
+
+	<select id="find_tel" resultType="Map" parameterType="Map">
+		select
+		*from member where TEL=#{input} and VISIBLE='TRUE'
+	</select>
+
+
+
+
+</mapper>

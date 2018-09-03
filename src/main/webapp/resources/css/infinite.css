@@ -1,0 +1,129 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By 즐겨찾기
+ */
+
+/* main 틀 */
+
+body {
+	background-color:#ffffff;
+	font-family: Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	
+}
+.main_body {
+  margin: 4% auto;
+  width: 90%; 
+}
+
+@media only screen and (min-width: 601px) {
+  .main_body {
+    width: 90%;
+  }
+}
+
+@media only screen and (min-width: 993px) {
+.main_body {
+    width: 80%;
+  }
+} 
+
+.box {
+	padding: 2rem;
+	border: 1.3px solid #d4d4d4;
+	margin: 1.5rem;
+	height:10%;
+}
+
+/* -main 틀 */
+
+/* navbar */
+nav ul a,
+nav .brand-logo {
+  color: #444;
+  
+  }
+
+@media only screen and (min-width: 100px) {
+
+ #top_nav{
+    height: 7rem;
+    line-height: 7rem;
+   /*  line-height: 5rem; */
+   /*  padding:  1rem; */
+  }
+  nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
+    line-height: 7rem;
+  }
+  nav .brand-logo {
+  position: absolute;
+  color: #fff;
+  display: inline-block;
+  font-size: 2.1rem;
+  padding: 0;
+  margin-top: 1rem;
+}
+}
+
+.bread_div{
+	padding-left: 15%;
+	/* background-color: #0795d3; */
+}
+
+.bread_div a{
+	font-size: 1.5rem;
+	font-weight: bold;
+	
+}
+/* -navbar */
+
+/* reserve_apply */
+.collapsible-body {
+  padding: 0;
+}
+/* reserve_apply */
+
+.pagination li.active {
+  background-color: #009688;
+}
+
+.tabs{
+	background-color: #ffffff;
+}
+
+.tabs .tab a {
+  color:  #009688;
+  font-size: large;
+}
+
+.tabs .tab a:hover, .tabs .tab a.active {
+  background-color: transparent;
+  color: #009688;
+}
+
+.tabs .indicator {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  background-color: #b2dfdb;
+  will-change: left, right;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active {
+  background-color: #e0f2f1;
+  outline: none;
+}
+
+
+/*modal*/
+.modal {
+  max-height: 90%;
+  width: 65%;
+  padding:2rem;
+}
+
+.modal.modal-fixed-footer {
+  height: 100%;
+}
